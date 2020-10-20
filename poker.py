@@ -63,6 +63,33 @@ class PokerHand:
             return False
         return False
 
+    def check_straight_flush(self):
+        # If both the straight and flush functions return true, then the hand must be a straight flush
+        if self.check_flush() and self.check_straight():
+            return True
+        else:
+            return False
+
+    def check_four_of_a_kind(self):
+        values = [i[0] for i in self.hand]
+        value_counts = defaultdict(lambda:0)
+        for v in values:
+            value_counts[v]+=1
+        if sorted(value_counts.values()) == [1,4]:
+            return True
+        return False
+
+
+    def check_full_house(self):
+        values = [i[0] for i in self.hand]
+        value_counts = defaultdict(lambda:0)
+        for v in values:
+            value_counts[v]+=1
+        if sorted(value_counts.values()) == [2,3]:
+            return True
+        return False
+
+
     def check_flush(self):
         suits = [h[1] for h in self.hand]
         # if there is only one suit in the hand, then we know it must be a flush
@@ -71,6 +98,61 @@ class PokerHand:
         # If there is more than one suit then we will return false
         return False
 
+    def check_straight(self):
+        # Taking the first letter for every hand in the list, thus taking the suit
+        values = [i[0] for i in self.hand]
+        value_counts = defaultdict(lambda:0)
+        # we are adding each suit to the dictionary and how many times it occurs
+        for v in values:
+            value_counts[v] += 1
+        # We are going through each suit in the dictionary and mapping the suit to a value that we have specified in the CARD_ORDER_VALUES data structure
+        rank_values = [CARD_ORDER_VALUES[i] for i in values]
+        # Here we are subtracting the largest value from the lowest, e.g. a hand of [10, 9, 8, 7, 6] is a straight and 10 - 6 == 4!
+        value_range = max(rank_values) - min(rank_values)
+        # We are saying that if there is only one suit and they range between a distance of four (meaning they must be contiguous) then the hand must be a straight
+        if len(set(value_counts.values())) == 1 and (value_range==4):
+            return True
+        else:
+            # As a straight can also occur with Ace being 1, we have specified a special case for a low ace hand 
+            if set(values) == set(["A", "2", "3", "4", "5"]):
+                return True
+            return False
+
+
+    def check_three_of_a_kind(self):
+        values = [i[0] for i in self.hand]
+        value_counts = defaultdict(lambda:0)
+        for v in values:
+            value_counts[v]+=1
+        if set(value_counts.values()) == set([3,1]):
+            return True
+        else:
+            return False
+
+    def check_two_pair(self):
+        values = [i[0] for i in self.hand]
+        # Creating a hash table where whatever key i specify will have a default value of 0 for now
+        value_counts = defaultdict(lambda: 0)
+        for v in values:
+            value_counts[v] += 1
+        # now we can sort the hash table and see if it follows a pattern that all two pair hands will follow, if it does then we know that our hand is a two pair
+        # we are saying that if after sorting our hash table by the values it is equal to 1,2,2 then its a two pair
+        if sorted(value_counts.values()) == [1, 2, 2]:
+            return True
+        return False
+
+
+    def check_pair(self):
+        values = [i[0] for i in self.hand]
+        # Creating a hash table where whatever key i specify will have a default value of 0 for now
+        value_counts = defaultdict(lambda: 0)
+        for v in values:
+            value_counts[v] += 1
+        # now we can sort the hash table and see if it follows a pattern that all two pair hands will follow, if it does then we know that our hand is a two pair
+        # we are saying that if after sorting our hash table by the values it is equal to 1,2,2 then its a two pair
+        if sorted(value_counts.values()) == [1, 1, 1, 2]:
+            return True
+        return False
 
 hand = PokerHand("TD 9S QS QH TH") # two pair returns three
 
