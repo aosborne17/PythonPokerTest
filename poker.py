@@ -13,7 +13,21 @@ class PokerHand:
     
     def compare_with(self, opponent):
         # Your code here
-        return 0
+        player = str(self.hand) # this should be the hand passed in when we initialise the class
+        hand = PokerHand(player)
+
+        player_score = hand.check_hand() # return 10 causes its a royal flush
+
+        opponent_hand = PokerHand(opponent) # This opponent variable is an arugement passed into the compare_with function
+        opponent_score = opponent_hand.check_hand() # returns 3 cause it's a two pair
+
+
+        if player_score > opponent_score:
+            return 1
+        elif opponent_score > player_score:
+            return 2
+        else:
+            return 0
     
     # This will be a helper function that will turn our string input of cards to a list, making it easier to compare later on
     def string_to_list(self):
