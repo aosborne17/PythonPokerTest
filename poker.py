@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from collections import defaultdict
+
+# GLOBAL CONSTANTS
+
+CARD_ORDER_VALUES = {"2":2, "3":3, "4":4, "5":5, "6":6, "7":7, "8":8, "9":9, "T":10,"J":11, "Q":12, "K":13, "A":14}
+
 class PokerHand:
     def __init__(self, hand):
         self.hand = hand
@@ -15,6 +21,48 @@ class PokerHand:
         self.hand = split_hand
         return self.hand
 
+
+    # We will create a function that will check the hands of both the user and the opponent, depending on what type of cards the user has we will return a number
+    # A royal flush having the highest number and a high card having the lowest number
+    # This means that when we pass this into the compare_with function, we will be able to know which has the better hand
+
+    def check_hand(self):
+        self.string_to_list()
+        if self.check_royal_flush():
+            return 10
+        if self.check_straight_flush():
+            return 9
+        if self.check_four_of_a_kind():
+            return 8
+        if self.check_full_house():
+            return 7
+        if self.check_flush():
+            return 6
+        if self.check_straight():
+            return 5
+        if self.check_three_of_a_kind():
+            return 4
+        if self.check_two_pair():
+            return 3
+        if self.check_pair():
+            return 2
+        # if none of the above is met, we know the hand is simply a high card
+        return 1
+
+    def check_royal_flush(self):
+        # first checking if this is a flush
+        if self.check_flush():
+            values = [i[0] for i in self.hand]
+            value_counts = defaultdict(lambda:0)
+            for v in values:
+                value_counts[v]+=1
+                # Checking if the royal flush pattern is present
+                if set(values) == set(["T", "J", "Q", "K", "A"]):
+                    return True
+        else:
+            return False
+        return False
+
     def check_flush(self):
         suits = [h[1] for h in self.hand]
         # if there is only one suit in the hand, then we know it must be a flush
@@ -25,6 +73,16 @@ class PokerHand:
 
 
 hand = PokerHand("TD 9S QS QH TH") # two pair returns three
+
+
+"""
+Helpful Links
+
+https://stackoverflow.com/questions/8419401/python-defaultdict-and-lambda
+https://www.accelebrate.com/blog/using-defaultdict-python
+https://www.partypoker.com/en/how-to-play/hand-rankings
+https://www.youtube.com/watch?v=JOomXP-r1wY&ab_channel=ClaremontsCasino
+"""
 
 
 # PSEUDOCODE
