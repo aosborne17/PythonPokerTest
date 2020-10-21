@@ -5,6 +5,7 @@ from collections import defaultdict
 
 # GLOBAL CONSTANTS
 
+# Creating a dictionary which will describe the value of each card in integer format
 CARD_ORDER_VALUES = {"2":2, "3":3, "4":4, "5":5, "6":6, "7":7, "8":8, "9":9, "T":10,"J":11, "Q":12, "K":13, "A":14}
 
 class PokerHand:
@@ -13,35 +14,31 @@ class PokerHand:
     
     def compare_with(self, opponent):
         # Your code here
-        player = str(self.hand) # this should be the hand passed in when we initialise the class
+        player = str(self.hand) # This is the hand passed in when we initialise the class
         hand = PokerHand(player)
+        player_score = hand.check_hand() # Setting a variable equal to whatever hand the user has
+        opponent_hand = PokerHand(opponent) # Initialising another object for the opponents hand, this will be passed in as an argument of the compare_with function
+        opponent_score = opponent_hand.check_hand() #Setting another variable equal to whatever hand the opponent has
 
-        player_score = hand.check_hand() # return 10 causes its a royal flush
-
-        opponent_hand = PokerHand(opponent) # This opponent variable is an arugement passed into the compare_with function
-        opponent_score = opponent_hand.check_hand() # returns 3 cause it's a two pair
-
-
-        if player_score > opponent_score:
+        if player_score > opponent_score: # if we beat the opponent a 1 is returned
             return 1
-        elif opponent_score > player_score:
+        elif opponent_score > player_score: # two is returned if we lose
             return 2
         else:
-            return 0
+            return 0 # 0 is returned if we tie the match
     
-    # This will be a helper function that will turn our string input of cards to a list, making it easier to compare later on
-    def string_to_list(self):
+    
+    def string_to_list(self): # This will be a helper function that will turn our string input of cards to a list, making it easier to compare later on
         split_hand = self.hand.split()
         self.hand = split_hand
         return self.hand
 
 
-    # We will create a function that will check the hands of both the user and the opponent, depending on what type of cards the user has we will return a number
-    # A royal flush having the highest number and a high card having the lowest number
-    # This means that when we pass this into the compare_with function, we will be able to know which has the better hand
-
-    def check_hand(self):
-        self.string_to_list()
+    
+    # The main function
+    def check_hand(self): # This will check from top to bottom which function the user and opponent hands are
+                          # Important to start from the top otherwise e.g. the flush function would be returned before we got to the royal flush
+        self.string_to_list()       # This helper function turns the string to a list, thus allowing each hand to be traversed much easier
         if self.check_royal_flush():
             return 10
         if self.check_straight_flush():
@@ -66,10 +63,11 @@ class PokerHand:
     def check_royal_flush(self):
         # first checking if this is a flush
         if self.check_flush():
-            values = [i[0] for i in self.hand]
-            value_counts = defaultdict(lambda:0)
-            for v in values:
-                value_counts[v]+=1
+            values = [i[0] for i in self.hand] # Taking the first char of each hand e.g. the '4' of '4D' and putting all five into a list
+            # print(values) # For a royal flush the list would look like: ['T', 'J', 'Q', 'K', 'A']
+            value_counts = defaultdict(lambda:0) # We are creating a default dictionary and giving any the key that is added to have the default value of 0
+            for v in values:                     # This stops the key error that would result from a normal dict
+                value_counts[v]+=1 # incrementing the key by one for every time e.g. a Jack is present in the hand
                 # Checking if the royal flush pattern is present
                 if set(values) == set(["T", "J", "Q", "K", "A"]):
                     return True
@@ -78,18 +76,19 @@ class PokerHand:
         return False
 
     def check_straight_flush(self):
-        # If both the straight and flush functions return true, then the hand must be a straight flush
-        if self.check_flush() and self.check_straight():
+        
+        if self.check_flush() and self.check_straight(): # If both the straight and flush functions return true, then the hand must be a straight flush; no need to write additional logic
             return True
         else:
             return False
 
     def check_four_of_a_kind(self):
         values = [i[0] for i in self.hand]
+        # Creating hash tables with default value of 0 for all keys
         value_counts = defaultdict(lambda:0)
         for v in values:
             value_counts[v]+=1
-        if sorted(value_counts.values()) == [1,4]:
+        if sorted(value_counts.values()) == [1,4]: # For a hand to be four of a kind it must have four of the same numbers, thus it would follow such a pattern seen here
             return True
         return False
 
@@ -99,15 +98,16 @@ class PokerHand:
         value_counts = defaultdict(lambda:0)
         for v in values:
             value_counts[v]+=1
-        if sorted(value_counts.values()) == [2,3]:
+        if sorted(value_counts.values()) == [2,3]: # Similar to the above, a full house card would have a three of the same and a two of the same
             return True
         return False
 
 
     def check_flush(self):
-        suits = [h[1] for h in self.hand]
+        suits = [i[1] for i in self.hand] # As opposed to the other functions, for this one we want the second character of each card in the hand, thus we take the 1st index and put in in a list
+        # print(suits) # For a flush of diamonds, the list would look like so: ['D', 'D', 'D', 'D', 'D']
         # if there is only one suit in the hand, then we know it must be a flush
-        if len(set(suits)) == 1:
+        if len(set(suits)) == 1: # Sets dont take duplicate values so as they are all 'D' the set should only be a length of 1
             return True
         # If there is more than one suit then we will return false
         return False
@@ -133,19 +133,18 @@ class PokerHand:
             return False
 
 
-    def check_three_of_a_kind(self):
+    def check_three_of_a_kind(self): # 3, 1, 1
         values = [i[0] for i in self.hand]
         value_counts = defaultdict(lambda:0)
         for v in values:
             value_counts[v]+=1
-        if set(value_counts.values()) == set([3,1]):
+        if set(value_counts.values()) == set([3,1]): # Similar logic to the other functions, a three of a kind would follow a pattern of 3,1,1 (only 3,1 in this case as we are using a set which doesn't take duplicates)
             return True
         else:
             return False
 
     def check_two_pair(self):
         values = [i[0] for i in self.hand]
-        # Creating a hash table where whatever key i specify will have a default value of 0 for now
         value_counts = defaultdict(lambda: 0)
         for v in values:
             value_counts[v] += 1
@@ -158,7 +157,6 @@ class PokerHand:
 
     def check_pair(self):
         values = [i[0] for i in self.hand]
-        # Creating a hash table where whatever key i specify will have a default value of 0 for now
         value_counts = defaultdict(lambda: 0)
         for v in values:
             value_counts[v] += 1
@@ -168,20 +166,15 @@ class PokerHand:
             return True
         return False
 
-hand = PokerHand("TD 9S QS QH TH") # two pair returns three
+
+hand = PokerHand("TD JD QD KD AD") # Testing Royal Flush
 
 
-"""
-Helpful Links
-
-https://stackoverflow.com/questions/8419401/python-defaultdict-and-lambda
-https://www.accelebrate.com/blog/using-defaultdict-python
-https://www.partypoker.com/en/how-to-play/hand-rankings
-https://www.youtube.com/watch?v=JOomXP-r1wY&ab_channel=ClaremontsCasino
-"""
+print(hand.compare_with("TD 7D 4D 5D QD"))
 
 
-# PSEUDOCODE
+
+# PSEUDOCODING THE FUNCTION LOGIC
 
 # I will need to write a function that compares one hand to another and sees which is better
 
@@ -214,10 +207,19 @@ https://www.youtube.com/watch?v=JOomXP-r1wY&ab_channel=ClaremontsCasino
 # TWO PAIR BEATS HIGH CARD SO WE BEAT OUR OPPONENT
 
 
+# We will create a function that will check the hands of both the user and the opponent, depending on what type of cards the user has we will return a number
+    # A royal flush having the highest number and a high card having the lowest number
+    # This means that when we pass this into the compare_with function, we will be able to know which has the better hand
 
 
+"""
+Helpful Links
 
-# WHAT ARE THE TEXAS HOLD EM RULES
+https://stackoverflow.com/questions/8419401/python-defaultdict-and-lambda
+https://www.accelebrate.com/blog/using-defaultdict-python
+https://www.partypoker.com/en/how-to-play/hand-rankings
+https://www.youtube.com/watch?v=JOomXP-r1wY&ab_channel=ClaremontsCasino
+"""
 
 """
 I am assuming that based on the code given there is only one opponent, thus only one comparison needs to be made
