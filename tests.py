@@ -16,7 +16,7 @@ class TestCase(unittest.TestCase):
         self.assertEqual(self.hand.compare_with(self.opponent), 1)
 
 
-    # Making sure that the function returns a number in the range of 1 to 10 depending on what hand pattern the user has
+    # Making sure that the function returns a number in the range of 1 to 10 depending on what hand pattern the user has, range is set to 11 as the last number is not included
     def test_check_hand(self):
         self.assertIn(self.hand.check_hand(), range(1, 11))
 
